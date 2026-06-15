@@ -5,11 +5,11 @@ compatibility_date = "2024-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "newssite-db"
-database_id = "REPLACE_WITH_YOUR_D1_ID"
+database_id = "49022d09-a937-437c-baf3-2a9a42ada9a9"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "REPLACE_WITH_YOUR_KV_ID"
+id = "2a22c467521f4616a391ae499366f7e0"
 
 [triggers]
 crons = ["*/30 * * * *", "0 */2 * * *", "*/5 * * * *", "0 * * * *", "0 */6 * * *"]
