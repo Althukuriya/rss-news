@@ -4,8 +4,8 @@ compatibility_date = "2024-01-01"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "newssite-db"
-database_id = "49022d09-a937-437c-baf3-2a9a42ada9a9"
+database_name = "news-rss-db"
+database_id = "2a18b97f-0125-4276-934c-aed5dd0179d2"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
