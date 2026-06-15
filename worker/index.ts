@@ -621,10 +621,83 @@ Return ONLY a JSON object with these exact fields:
     const cron = event.cron;
 
     // RSS fetcher - every 30 minutes
-    if (cron === '*/30 * * * *') {
-      console.log('Running RSS fetcher...');
-      // Implement RSS fetching logic
+console.log('Running RSS fetcher...');
+
+const rssSources = await env.DB.prepare(
+  'SELECT * FROM rss_sources WHERE is_active = 1'
+).all();
+
+for (const source of rssSources.results || []) {
+  try {
+    const response = await fetch(source.url);
+    const xml = await response.text();
+
+    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
+
+    for (const item of items.slice(0, 5)) {
+      const content = item[1];
+
+      const title =
+        content.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] ||
+        content.match(/<title>(.*?)<\/title>/)?.[1] ||
+        '';
+
+      const description =
+        content.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1] ||
+        content.match(/<description>(.*?)<\/description>/)?.[1] ||
+        '';
+
+      const link =
+        content.match(/<link>(.*?)<\/link>/)?.[1] || '';
+
+      if (!title) continue;
+
+      const existing = await env.DB.prepare(
+        'SELECT id FROM articles WHERE title = ?'
+      )
+      .bind(title)
+      .first();
+
+      if (existing) continue;
+
+      const article = await generateArticleWithGroq(
+        env,
+        `${title}\n\n${description}`
+      );
+
+      await env.DB.prepare(`
+        INSERT INTO articles (
+          id,title,slug,excerpt,body,
+          category,status,author,
+          created_at,published_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+      .bind(
+        crypto.randomUUID(),
+        article.title,
+        article.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        article.excerpt,
+        article.body,
+        source.category || 'News',
+        'published',
+        'AI News Desk',
+        new Date().toISOString(),
+        new Date().toISOString()
+      )
+      .run();
     }
+
+    await env.DB.prepare(
+      'UPDATE rss_sources SET last_fetched_at = ? WHERE id = ?'
+    )
+    .bind(new Date().toISOString(), source.id)
+    .run();
+
+  } catch (err) {
+    console.error(`RSS fetch failed: ${source.name}`, err);
+  }
+}
 
     // Trends fetcher - every 2 hours
     if (cron === '0 */2 * * *') {
