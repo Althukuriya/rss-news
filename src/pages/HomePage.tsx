@@ -24,7 +24,7 @@ export default function HomePage() {
       try {
         setIsLoading(true);
 
-        const [{ data: featured }] = await getArticles({ status: 'published', limit: 5, orderBy: 'published_at' });
+        const { data: featured } = await getArticles({ status: 'published', limit: 5, orderBy: 'published_at' });
         setFeaturedArticles(featured || []);
 
         const categoryData: Record<string, Article[]> = {};
