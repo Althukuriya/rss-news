@@ -1,0 +1,18 @@
+name = "newssite-worker"
+main = "worker/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "newssite-db"
+database_id = "REPLACE_WITH_YOUR_D1_ID"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "REPLACE_WITH_YOUR_KV_ID"
+
+[triggers]
+crons = ["*/30 * * * *", "0 */2 * * *", "*/5 * * * *", "0 * * * *", "0 */6 * * *"]
+
+[vars]
+ENVIRONMENT = "production"
