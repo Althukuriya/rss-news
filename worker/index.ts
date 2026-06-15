@@ -633,7 +633,7 @@ Return ONLY a JSON object with these exact fields:
       const regions = ['IN', 'US', 'GB', 'AE', ''];
       for (const region of regions) {
         try {
-          const url = `https://trends.google.com/trends/trendingsearches/daily/rss${region ? `?geo=${region}` : ''}`;
+          const url = `https://trends.google.com/trending/rss?${region ? `?geo=${region}` : ''}`;
           const response = await fetch(url);
           const text = await response.text();
           // Parse RSS and insert trending topics
